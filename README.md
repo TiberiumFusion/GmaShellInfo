@@ -56,11 +56,13 @@ This repository consists of a single Visual Studio 2017 solution containing all 
 - `Installer.Msi.GmaShellInfo` and `Installer.Bundle` are [WiX](http://wixtoolset.org/) v3 projects that produce the release installers. The [WiX v3 toolset](https://github.com/wixtoolset/wix/releases) and Visual Studio [extension](https://marketplace.visualstudio.com/items?itemName=WixToolset.WiXToolset) must be installed to build these two projects.
 - `WixCaShellAssocNotify` is a custom action for the WiX installer projects. Building it requires the v100 MSVC toolset, the Windows 7 SDK, and the WiX v3 toolset.
 
+#### v100 VCRedist
 `Installer.Bundle` embeds the v100 SP1 MSVC redistributable installers to run during the GmaShellInfo installation. These vcredist installers are **not** present in this repository. The build will fail when these files are missing.
 1. [Acquire them](https://github.com/abbodi1406/vcredist/blob/master/source_links/README.md#microsoft-visual-c-2010-redistributables---v10) from Microsoft.
 2. Place the x86 installer at `Installer.Bundle\EmbedPrereqInstallers\vcredist_x86_2010_SP1.exe`
 3. Place the x64 installer at `Installer.Bundle\EmbedPrereqInstallers\vcredist_x64_2010_SP1.exe`
 
+Refer to notes in `Installer.Bundle\Bundle.wxs` regading which revision of the v100 SP1 vcredist to download & embed.
 
 <br />
 
