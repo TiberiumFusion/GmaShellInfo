@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+
+<?define BundleName = "GmaShellInfo" ?>
+
+<?if $(var.Platform) = x64 ?>
+
+	<?define Win64 = "yes" ?>
+	<?define PlatformProgramFilesFolder = "ProgramFiles64Folder" ?>
+	<?if $(var.Configuration) = Debug ?>
+		<?define BundleNameArch = "GmaShellInfo (64-bit) DEBUG" ?>
+	<?else ?>
+		<?define BundleNameArch = "GmaShellInfo (64-bit)" ?>
+	<?endif ?>
+	<?define BundleUpgradeCode = "c8599153-620c-431b-8e1b-2f3bb12c07dc" ?>
+	<?define VCRedistDisplayName = "Microsoft Visual C++ 2010 x64 Runtime" ?>
+	<?define VCRedistFilename = "vcredist_x64_2010_SP1.exe" ?>
+	<?define VCRedistCheckUpgradeCode = "5B75F761-BAC8-33BC-A381-464DDDD813A3" ?> <!-- 10.0.40219.x (SP1) -->
+
+<?else ?> <!-- x86 -->
+
+	<?define Win64 = "no" ?>
+	<?define PlatformProgramFilesFolder = "ProgramFilesFolder" ?>
+	<?if $(var.Configuration) = Debug ?>
+		<?define BundleNameArch = "GmaShellInfo (32-bit) DEBUG" ?>
+	<?else ?>
+		<?define BundleNameArch = "GmaShellInfo (32-bit)" ?>
+	<?endif ?>
+	<?define BundleUpgradeCode = "10f82d10-2aa7-48bf-a098-1b0681d38518" ?>
+	<?define VCRedistDisplayName = "Microsoft Visual C++ 2010 x86 Runtime" ?>
+	<?define VCRedistFilename = "vcredist_x86_2010_SP1.exe" ?>
+	<?define VCRedistCheckUpgradeCode = "1F4F1D2A-D9DA-32CF-9909-48485DA06DD5" ?> <!-- 10.0.40219.x (SP1) -->
+
+<?endif ?>
+
+
+
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
+	 xmlns:util="http://schemas.microsoft.com/wix/UtilExtension"
+	 xmlns:bal="http://schemas.microsoft.com/wix/BalExtension">
+	<Bundle Name="$(var.BundleNameArch)" Manufacturer="TiberiumFusion"
+			Version="1.0.0"
+			UpgradeCode="$(var.BundleUpgradeCode)">
+
+		<BootstrapperApplicationRef Id="WixStandardBootstrapperApplication.RtfLicense">
+			<bal:WixStandardBootstrapperApplication LicenseFile="LicenseText.rtf" ShowVersion="yes" />
+		</BootstrapperApplicationRef>
+
+		<Variable Name="InstallFolder" Type="string" Value="[$(var.PlatformProgramFilesFolder)]$(var.BundleName)" /> <!-- Keep synced with default INSTALLDIR in Installer.Msi.GmaShellInfo -->
+		
+		<Chain>
+			<PackageGroupRef Id="VCRedist100"/>
+			<MsiPackage Id="GmaShellInfo" SourceFile="$(var.Installer.Msi.GmaShellInfo.TargetPath)">
+				<MsiProperty Name="INSTALLDIR" Value="[InstallFolder]" />
+			</MsiPackage>
+		</Chain>
+		
+	</Bundle>
+	
+	<!-- VC redist install -->
+	<Fragment>
+		<!-- Check installation state of the v100 SP1 redistributable -->
+		
+		<!--
+			Microsoft screwed up the v100 runtime installers.
+			- SP1 is 10.0.40219.x
+			- Between 2011 and 2013 there were several hotfix revisions to SP1 that went up to 10.0.40219.473
+			- The "official" version to download from MS (since 2020) is a perpetually re-released 10.0.40219.325 with the only(?) change being its authenticode signature
+			
+			Also:
+			- Revision 473 fails to install on stock 7 SP1 images due to a "trust failure". Contemporary systems are not affected. This 473 installer has a dual authenticode sign from 2016.
+			- The 2020 and 2021 sha-2 only re-signed installers of 325 successfully install on the same stock 7 SP1 images but ofc cannot have their signatures validated.
+			
+			So which v100 installer is the correct one? Who knows. Since it's not obvious, our decision will be to maintain status quo on the target machine and keep the user's choice of their installed v100 runtime revision.
+			
+			Complications:
+			- The v100 installer always forces a repair install when ran in /passive or /quiet mode. Interactive mode does not have this problem.
+				- There is no apparent flag to disable this behavior, i.e. there is no way to make the installer end early and do nothing if a newer revision is already installed
+				- Thus, the 325 revision installers will happily clobber any higher revision already installed on the user's machine (like 473)
+			
+			Solution:
+			- We use the original 325 revision installer from 2011 with its original signature. No trust failure on stock Windows.
+			- We have to query the installed version of v100 and do the "dont repair install over a newer revision" check here ourselves
+		-->
+		
+		<!--
+		<util:ProductSearch Id="VCREDIST100_VERSION"
+							UpgradeCode="$(var.VCRedistCheckUpgradeCode)"
+							Result="version"
+							Variable="VCREDIST100_VERSION" />
+		-->
+		<!-- Windows Installer ignores the revision field when registering installed packages, so we have to find it elsewhere -->
+		<util:ProductSearch Id="VCREDIST100_STATE"
+							UpgradeCode="$(var.VCRedistCheckUpgradeCode)"
+							Result="state"
+							Variable="VCREDIST100_STATE" />
+		<util:FileSearch Id="MSVCP100_VERSION"
+						 Path="[SystemFolder]\msvcp100.dll"
+						 Result="version"
+						 Variable="MSVCP100_VERSION"/>
+		
+		<PackageGroup Id="VCRedist100">
+			<ExePackage Id="VCRedist100"
+						DisplayName="$(var.VCRedistDisplayName)"
+						SourceFile="EmbedPrereqInstallers\$(var.VCRedistFilename)"
+						Vital="yes"
+						Permanent="yes"
+						Compressed="yes"
+						InstallCommand="/q /norestart"
+						DetectCondition="(VCREDIST100_STATE = 5) AND (MSVCP100_VERSION &gt;= v10.0.40219.325)"/>
+		</PackageGroup>
+	</Fragment>
+
+</Wix>

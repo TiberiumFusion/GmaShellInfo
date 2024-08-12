@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+
+<?define ProductName = "GmaShellInfo" ?>
+
+<?if $(var.Platform) = x64 ?>
+
+	<?define Win64 = "yes" ?>
+	<?define PlatformProgramFilesFolder = "ProgramFiles64Folder" ?>
+	<?if $(var.Configuration) = Debug ?>
+		<?define ProductNameArch = "GmaShellInfo (64-bit) DEBUG" ?>
+	<?else ?>
+		<?define ProductNameArch = "GmaShellInfo (64-bit)" ?>
+	<?endif ?>
+	<?define ProductId = "f98cdbec-bd36-49de-ad82-077cd5c2f5a8" ?>
+	<?define ProductUpgradeCode = "f98cdbec-bd36-49de-ad82-077cd5c2f5a8" ?>
+	<?define ComponentGuid_GmaShellPropertyHandler = "c09d0784-85b7-49c4-9ba9-fde5fd071e3e" ?>
+
+<?else ?> <!-- x86 -->
+
+	<?define Win64 = "no" ?>
+	<?define PlatformProgramFilesFolder = "ProgramFilesFolder" ?>
+	<?if $(var.Configuration) = Debug ?>
+		<?define ProductNameArch = "GmaShellInfo (32-bit) DEBUG" ?>
+	<?else ?>
+		<?define ProductNameArch = "GmaShellInfo (32-bit)" ?>
+	<?endif ?>
+	<?define ProductId = "38ec2ccb-7ba9-42c3-b8db-1da6f4c9a1f6" ?>
+	<?define ProductUpgradeCode = "8535a5fb-f415-47d5-89a9-2b638fbd38b2" ?>
+	<?define ComponentGuid_GmaShellPropertyHandler = "635930b2-fac7-4477-95fd-ee16158713a1" ?>
+
+<?endif ?>
+
+
+
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+	
+	<Product Id="$(var.ProductId)"
+			 Name="$(var.ProductNameArch)" Manufacturer="TiberiumFusion"
+			 Language="1033"
+			 Version="1.0.0"
+			 UpgradeCode="$(var.ProductUpgradeCode)">
+		
+		<Package InstallerVersion="300" Compressed="yes" InstallScope="perMachine" Description="Installer for $(var.ProductNameArch)" />
+		
+		<MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+		
+		<!-- Abort on init for unsupported Windows versions -->
+		<!--
+			If there is only 1 feature and if it has been conditionally disabled, the WiX UI still lets the user get all the way to the feature selection tree, which is blank and thus blocks the interactive install from proceeding any further
+			This is confusing and annoying, and it cannot be customized with any message.
+			Since we currently only have 1 feature, we will use the customizable message of the abort-on-init mechanism to inform the user of this problem.
+			Each condition that may disable the feature will be replicated here. Refer to source conditions in the Features section for more info.
+		-->
+		<Condition Message="GmaShellInfo requires Windows Vista / Server 2008 or newer. You cannot install GmaShellInfo on this version of Windows.">
+			<![CDATA[ Installed OR (VersionNT >= 600) ]]>
+		</Condition>
+		
+		<MediaTemplate EmbedCab="yes" CompressionLevel="mszip" />
+		
+		<UIRef Id="WixUI_FeatureTree" />
+		<UIRef Id="WixUI_ErrorProgressText" />
+
+		<WixVariable Id="WixUILicenseRtf" Value="LicenseText.rtf" />
+		
+		<FeatureRef Id="GmaShellPropertyHandler" />
+
+		<InstallExecuteSequence>
+			<Custom Action="PostComRegisterShellNotify" After="InstallFiles" />
+		</InstallExecuteSequence>
+	
+	</Product>
+	
+	<!-- Install directory layout -->
+	<Fragment>
+		<Directory Id="TARGETDIR" Name="SourceDir">
+			<Directory Id="$(var.PlatformProgramFilesFolder)">
+				<Directory Id="INSTALLDIR" Name="$(var.ProductName)" />
+			</Directory>
+		</Directory>
+	</Fragment>
+
+	<!-- Components -->
+	<Fragment>
+		<ComponentGroup Id="ProductComponents" Directory="INSTALLDIR">
+			<Component Id="GmaShellPropertyHandler.dll" Guid="$(var.ComponentGuid_GmaShellPropertyHandler)" Win64="$(var.Win64)">
+				<File Id="GmaShellPropertyHandler.dll"
+					  Name="GmaShellPropertyHandler.dll"
+					  Source="$(var.GmaShellPropertyHandler.TargetPath)"
+					  KeyPath="yes"
+					  Vital="yes">
+					<!-- COM class information harvested with heat -->
+					<Class Id="{6FCF7E65-467E-4659-A480-64E6E8AA7887}" Context="InprocServer32" Description="Garry's Mod GMA (.gma) Property Handler" ThreadingModel="both" />
+				</File>
+				<!-- COM class information harvested with heat -->
+				<RegistryValue Root="HKCR" Key=".gma" Value="GmaShellInfo.GMA.1" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="GmaShellInfo.GMA.1\ShellEx\{e357fccd-a995-4576-b01f-234630154e96}" Value="{9DBD2C50-62AD-11D0-B806-00C04FD706EC}" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="GmaShellInfo.GMA.1" Name="TileInfo" Value="prop:System.Title;System.Author;System.Size;System.DateModified" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="GmaShellInfo.GMA.1" Name="PreviewDetails" Value="prop:System.Title;System.Author;System.Link.Description;System.Category;System.Keywords;System.DateModified" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="GmaShellInfo.GMA.1" Name="InfoTip" Value="prop:System.Title;System.Author;System.DateModified;System.Size" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="GmaShellInfo.GMA.1" Name="FullDetails" Value="prop:System.Title;System.PropGroup.Description;System.Author;System.Link.Description;System.Category;System.Keywords;System.PropGroup.FileSystem;System.ItemNameDisplay;System.ItemType;System.ItemFolderPathDisplay;System.DateCreated;System.DateModified;System.Size;System.FileAttributes;System.OfflineAvailability;System.OfflineStatus;System.SharedWith;System.FileOwner;System.ComputerName" Type="string" Action="write" />
+                <RegistryValue Root="HKCR" Key="GmaShellInfo.GMA.1" Name="ExtendedTileInfo" Value="prop:System.ItemType;System.Size;System.Link.Description;System.Category;System.Keywords" Type="string" Action="write" />
+                <RegistryValue Root="HKLM" Key="Software\Microsoft\Windows\CurrentVersion\Explorer" Name="GlobalAssocChangedCounter" Value="1" Type="integer" Action="write" />
+                <RegistryValue Root="HKLM" Key="Software\Microsoft\Windows\CurrentVersion\PropertySystem\PropertyHandlers\.gma" Value="{6FCF7E65-467E-4659-A480-64E6E8AA7887}" Type="string" Action="write" />
+			</Component>
+		</ComponentGroup>
+	</Fragment>
+	
+	<!-- Features -->
+	<Fragment>
+		<Feature Id="GmaShellPropertyHandler" Level="0" ConfigurableDirectory="INSTALLDIR" AllowAdvertise="no" Absent="disallow"
+				 Title="Property Handler Shell Extension"
+				 Description="Displays addon name, author, description, type, and tags for .gma files in Windows Explorer.">
+			<ComponentGroupRef Id="ProductComponents" />
+			<Condition Level="1">
+				<![CDATA[ VersionNT >= 600 ]]> <!-- Property Handlers are introduced in NT 6.0 -->
+			</Condition>
+		</Feature>
+	</Fragment>
+	
+	<!-- Post-install shell notify for handler association change -->
+	<Fragment>
+		<CustomAction Id="PostComRegisterShellNotify" BinaryKey="CaShellAssocNotify" DllEntry="WixCaShellAssocNotify" Execute="commit" Return="ignore" />
+		<Binary Id="CaShellAssocNotify" SourceFile="$(var.WixCaShellAssocNotify.TargetPath)" />
+	</Fragment>
+	
+</Wix>

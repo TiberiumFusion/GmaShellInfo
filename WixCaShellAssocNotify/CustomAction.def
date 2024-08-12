@@ -1,0 +1,4 @@
+LIBRARY "WixCaShellAssocNotify"
+
+EXPORTS
+	WixCaShellAssocNotify
