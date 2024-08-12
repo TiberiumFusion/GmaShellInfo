@@ -1,5 +1,5 @@
 # GmaShellInfo
-A shell extension for Windows Explorer which displays the metadata of .gma addon archive files used by Garry's Mod.
+A shell extension for Windows which displays the metadata of .gma addon archive files used by Garry's Mod.
 
 ### Before
 ![Before](https://github.com/user-attachments/assets/082069eb-ef99-43b6-b509-63d13320ab62)
