@@ -2,10 +2,10 @@
 A shell extension for Windows Explorer which displays the metadata of .gma addon archive files used by Garry's Mod.
 
 ### Before
-![Before](https://github.com/user-attachments/assets/51ef3617-ce57-4d2f-995b-ed4982eb805c)
+![Before](https://github.com/user-attachments/assets/082069eb-ef99-43b6-b509-63d13320ab62)
 
 ### After
-![After](https://github.com/user-attachments/assets/138087e9-4038-4ab6-abb0-ac2b1a740983)
+![After](https://github.com/user-attachments/assets/6d841a60-52fc-4f54-9135-5983f74ae66d)
 
 The following shell properties are provided from the .gma metadata:
 | .gma Metadata | Shell Property Mapping | Notes |
@@ -39,8 +39,8 @@ Shell extensions are architecture-specific.
 ### Usage Hints
 Once installed, open Explorer and navigate to a folder containing .gma files.
 - In the details view, right-click the column headers to add additional columns </br> ![ExportToGif](https://github.com/user-attachments/assets/ab62f71a-98a0-4ff8-aebc-db9775098cdc)
-- Selecting a file will show all available properties in the properties panel... <br/> ![File properties panel](https://github.com/user-attachments/assets/cf7ae1ae-562f-4f5d-94c8-a10689551a65)
-- ...and in the full property sheet <br/> ![Property sheet](https://github.com/user-attachments/assets/eedbf529-e253-4207-bd3e-8a1e77adf820)
+- Selecting a file will show all available properties in the properties panel... <br/> ![File properties panel](https://github.com/user-attachments/assets/865e9129-73b0-48f0-9853-0e11d9119e2f)
+- ...and in the full property sheet <br/> ![Property sheet](https://github.com/user-attachments/assets/15430891-4083-445f-83ae-ab3e90a92759)
 
 ### Troubleshooting
 If you do not see the metadata of your .gma files:
