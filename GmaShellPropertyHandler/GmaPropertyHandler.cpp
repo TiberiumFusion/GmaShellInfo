@@ -257,9 +257,7 @@ HRESULT CGmaPropertyHandler::Initialize(IStream *pStream, DWORD grfMode)
 	UNREFERENCED_PARAMETER(grfMode);
 
     HRESULT hr = E_UNEXPECTED;
-
-	//DebugBreak();
-
+	
     if (!_pStream)
     {
 		// Save a reference to the stream
@@ -498,7 +496,7 @@ bool CGmaPropertyHandler::_SearchContentStringConcat(PWSTR pwszSearchContents, P
 
 	159321088.gma
 		- Old(er) gma header format, back when `description` actually had a description in it, before it was turned into a json chunk
-		- `author` field is always constant "author" string
+		- `author` field is always* constant "author" string
 
 		0000h  47 4D 41 44 03 1E 18 19 08 01 00 10 01 0C 11 DF 51 00 00 00 00 00 74 74  GMAD...........ßQ.....tt 
 		0018h  74 5F 6D 69 6E 65 63 72 61 66 74 5F 62 35 00 4E 6F 20 63 72 65 64 69 74  t_minecraft_b5.No credit 
@@ -515,7 +513,7 @@ bool CGmaPropertyHandler::_SearchContentStringConcat(PWSTR pwszSearchContents, P
 
 	124648402.gma
 		- New(er) gma header format, with json chunk in `description`
-		- `author` field is now a constant "Author Name" string
+		- `author` field is now always* a constant "Author Name" string
 
 		0000h  47 4D 41 44 03 00 00 00 00 00 00 00 00 E4 78 0B 5D 00 00 00 00 00 4F 72  GMAD.........äx.].....Or 
 		0018h  62 69 74 61 6C 20 46 72 69 65 6E 64 73 68 69 70 20 43 61 6E 6E 6F 6E 00  bital Friendship Cannon. 
@@ -526,12 +524,14 @@ bool CGmaPropertyHandler::_SearchContentStringConcat(PWSTR pwszSearchContents, P
 		0090h  4E 61 6D 65 00 01 00 00 00 01 00 00 00 6C 75 61 2F 77 65 61 70 6F 6E 73  Name.........lua/weapons 
 		00A8h  2F 6F 72 62 69 74 61 6C 5F 66 72 69 65 6E 64 73 68 69 70 5F 63 61 6E 6E  /orbital_friendship_cann 
 		00C0h  6F 6E 2E 6C 75 61 00 CB 3C 00 00 00 00 00 00 37 E2 3B 90 02 00 00 00 6D  on.lua.Ë<......7â;
-		
+	
+	*Some gmas have actual strings in `author`. gmad.exe does not support this, so these gmas were modified or produced through alternate means.
+
 	The header fields are delineated by null bytes.
 	There are always exactly header three fields:
 	- Name
-	- Description
 	- Author
+	- Description
 */
 
 // Load the property data we want from the current file stream to the GMA file
@@ -704,7 +704,7 @@ HRESULT CGmaPropertyHandler::_ReadRelevantGmaData()
 		// Return will be null if parsing failed
 		// cJSON_GetErrorPtr() will have details on why
 		// Could be malformed json, could be data that is not json
-		// GMAD presumably validates addon.json on gma creation, so the former is unlikely, but still possible
+		// gmad.exe presumably validates addon.json on gma creation, so the former is unlikely, but still possible
 		// In any regard, if the parsing fails, we will treat the body of the `description` field as basic text, i.e. the old(er) format before the json chunk introduction
 	}
 
@@ -951,25 +951,25 @@ HRESULT CGmaPropertyHandler::_PostProcessGmaData()
 
 HRESULT RegisterPropLists(CRegisterExtension &re, PCWSTR pszFileAssoc)
 {
-    const WCHAR c_szPlaylistTileInfo[] = L"prop:System.Title;System.Author;System.Size;System.DateModified";
-    const WCHAR c_szPlaylistPreviewDetails[] = L"prop:System.Title;System.Author;System.Link.Description;System.Category;System.Keywords;System.DateModified";
-    const WCHAR c_szPlaylistInfoTip[] = L"prop:System.Title;System.Author;System.DateModified;System.Size";
-    const WCHAR c_szPlaylistFullDetails[] = L"prop:System.Title;System.PropGroup.Description;System.Author;System.Link.Description;System.Category;System.Keywords;System.PropGroup.FileSystem;System.ItemNameDisplay;System.ItemType;System.ItemFolderPathDisplay;System.DateCreated;System.DateModified;System.Size;System.FileAttributes;System.OfflineAvailability;System.OfflineStatus;System.SharedWith;System.FileOwner;System.ComputerName";
-    const WCHAR c_szPlaylistExtendedTileInfo[] = L"prop:System.ItemType;System.Size;System.Link.Description;System.Category;System.Keywords";
+    const WCHAR c_szPropertiesTileInfo[] = L"prop:System.Title;System.Author;System.Size;System.DateModified";
+    const WCHAR c_szPropertiesPreviewDetails[] = L"prop:System.Title;System.Author;System.Link.Description;System.Category;System.Keywords;System.DateModified";
+    const WCHAR c_szPropertiesInfoTip[] = L"prop:System.Title;System.Author;System.DateModified;System.Size";
+    const WCHAR c_szPropertiesFullDetails[] = L"prop:System.Title;System.PropGroup.Description;System.Author;System.Link.Description;System.Category;System.Keywords;System.PropGroup.FileSystem;System.ItemNameDisplay;System.ItemType;System.ItemFolderPathDisplay;System.DateCreated;System.DateModified;System.Size;System.FileAttributes;System.OfflineAvailability;System.OfflineStatus;System.SharedWith;System.FileOwner;System.ComputerName";
+    const WCHAR c_szPropertiesExtendedTileInfo[] = L"prop:System.ItemType;System.Size;System.Link.Description;System.Category;System.Keywords";
 
-    HRESULT hr = re.RegisterProgIDValue(pszFileAssoc, L"TileInfo", c_szPlaylistTileInfo);
+    HRESULT hr = re.RegisterProgIDValue(pszFileAssoc, L"TileInfo", c_szPropertiesTileInfo);
     if (SUCCEEDED(hr))
     {
-        hr = re.RegisterProgIDValue(pszFileAssoc, L"PreviewDetails", c_szPlaylistPreviewDetails);
+        hr = re.RegisterProgIDValue(pszFileAssoc, L"PreviewDetails", c_szPropertiesPreviewDetails);
         if (SUCCEEDED(hr))
         {
-            hr = re.RegisterProgIDValue(pszFileAssoc, L"InfoTip", c_szPlaylistInfoTip);
+            hr = re.RegisterProgIDValue(pszFileAssoc, L"InfoTip", c_szPropertiesInfoTip);
             if (SUCCEEDED(hr))
             {
-                hr = re.RegisterProgIDValue(pszFileAssoc, L"FullDetails", c_szPlaylistFullDetails);
+                hr = re.RegisterProgIDValue(pszFileAssoc, L"FullDetails", c_szPropertiesFullDetails);
                 if (SUCCEEDED(hr))
                 {
-                    hr = re.RegisterProgIDValue(pszFileAssoc, L"ExtendedTileInfo", c_szPlaylistExtendedTileInfo);
+                    hr = re.RegisterProgIDValue(pszFileAssoc, L"ExtendedTileInfo", c_szPropertiesExtendedTileInfo);
                 }
             }
         }
