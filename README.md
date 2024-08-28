@@ -26,8 +26,8 @@ GmaShellInfo requires the Microsoft Visual C++ 2010 runtime. This is included in
 ### Installation
 - Go to the [releases page](https://github.com/TiberiumFusion/GmaShellInfo/releases) and select a release, such as the [latest](https://github.com/TiberiumFusion/GmaShellInfo/releases/latest).
 - Dowload the installer which matches [your system's architecture](https://www.howtogeek.com/21726/how-do-i-know-if-im-running-32-bit-or-64-bit-windows-answers/).
-  - On 64-bit systems, download the GmaShellInfo_1.0.0_**x64**.exe installer. Most systems today are 64-bit.
-  - On 32-bit systems, download the GmaShellInfo_1.0.0_**x86**.exe installer.
+  - On 64-bit systems, download the GmaShellInfo_x.x.x_**x64**.exe installer. Most systems today are 64-bit.
+  - On 32-bit systems, download the GmaShellInfo_x.x.x_**x86**.exe installer.
 - Run the installer.
 - GmaShellInfo will be activated as soon as the installer completes.
 
@@ -53,7 +53,7 @@ If you do not see the metadata of your .gma files:
 # Building
 This repository consists of a single Visual Studio 2017 solution containing all relevant projects. Requirements are listed below.
 - `GmaShellPropertyHandler` is the Property Handler shell extension that constitutes GmaShellInfo. It is set up to build with the Visual Studio 2010 (v100) MSVC toolset and the Windows 7 SDK.
-- `Installer.Msi.GmaShellInfo` and `Installer.Bundle` are [WiX](http://wixtoolset.org/) v3 projects that produce the release installers. The [WiX v3 toolset](https://github.com/wixtoolset/wix/releases) and Visual Studio [extension](https://marketplace.visualstudio.com/items?itemName=WixToolset.WiXToolset) must be installed to build these two projects.
+- `Installer.Msi.GmaShellInfo` and `Installer.Bundle` are [WiX](http://wixtoolset.org/) v3 projects that produce the release installers. The [WiX v3 toolset](https://github.com/wixtoolset/wix3/releases) and Visual Studio [extension](https://marketplace.visualstudio.com/items?itemName=WixToolset.WiXToolset) must be installed to build these two projects.
 - `WixCaShellAssocNotify` is a custom action for the WiX installer projects. Building it requires the v100 MSVC toolset, the Windows 7 SDK, and the WiX v3 toolset.
 
 #### v100 VCRedist
