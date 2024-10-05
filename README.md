@@ -39,7 +39,7 @@ Shell extensions are architecture-specific.
 ### Usage Hints
 Once installed, open Explorer and navigate to a folder containing .gma files.
 - In the details view, right-click the column headers to add additional columns </br> ![ExportToGif](https://github.com/user-attachments/assets/ab62f71a-98a0-4ff8-aebc-db9775098cdc)
-- Selecting a file will show all available properties in the properties panel... <br/> ![File properties panel](https://github.com/user-attachments/assets/865e9129-73b0-48f0-9853-0e11d9119e2f)
+- Selecting a file will show all available properties in the properties panel... <br/> ![File properties panel cropped](https://github.com/user-attachments/assets/661fbab8-2069-463a-91ea-9b41cfc02843)
 - ...and in the full property sheet <br/> ![Property sheet](https://github.com/user-attachments/assets/15430891-4083-445f-83ae-ab3e90a92759)
 
 ### Troubleshooting
